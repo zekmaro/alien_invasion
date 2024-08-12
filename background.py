@@ -1,19 +1,19 @@
 import pygame
 
-class Ship:
+class BackGround:
 
 	def __init__(self, ai_game):
 
 		self.screen = ai_game.screen
 		self.screen_rect = ai_game.screen.get_rect()
-	
-		self.image = pygame.image.load('images/ship.png')
-		size = (100, 100)
+		
+		self.image = pygame.image.load('images/bg_space.png')
+
+		size  = (1200, 900)
 		self.image = pygame.transform.scale(self.image, size)
+	
 		self.rect = self.image.get_rect()
 
-		self.rect.midbottom = self.screen_rect.midbottom
-	
-	def put_ship_on_screen(self):
+	def put_bg_on_screen(self):
 
 		self.screen.blit(self.image, self.rect)
