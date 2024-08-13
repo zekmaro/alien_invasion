@@ -1,4 +1,5 @@
 import	sys
+import	random
 import	pygame
 from	ship import Ship
 from	background import BackGround
@@ -22,10 +23,24 @@ class ALienInvasion:
 		self.bullet_list = []
 		self.enemy_list = []
 		self.draw_bullet = 0
+
+	def	check_enemy_exist_at_x(self, existing_enemy, current_enemy_coor_x):
+		return abs(existing_enemy.rect.x - current_enemy_coor_x) >= 50
 	
 	def initialise_enemies(self, amount_enemies):
 		while amount_enemies:
 			enemy = Enemy(self)
+			valid_position = False
+			while not valid_position:
+				spawn_coor_x = random.randint(0, self.screen_rect.width - enemy.rect.width)
+				valid_position = True
+				
+				for existing_enemy in self.enemy_list:
+					if not self.check_enemy_exist_at_x(existing_enemy, spawn_coor_x):
+						valid_position = False
+						break  # No need to check further, find a new position
+
+			enemy.rect.x = spawn_coor_x
 			self.enemy_list.append(enemy)
 			amount_enemies -= 1
 
@@ -37,14 +52,20 @@ class ALienInvasion:
 			else:
 				bullet_list.remove(bullet)
 
-	def	handle_enemies(self, enemy_list):
+	def	handle_enemies(self, enemy_list, bullet_list):
 		for enemy in enemy_list[:]:
-			if enemy.rect.bottom < self.screen_rect.bottom:
+			if enemy.rect.y < self.screen_rect.bottom:
 				enemy.put_enemy_on_screen()
-				enemy.rect.bottom += 1
+				enemy.rect.y += 1
+				for bullet in bullet_list[:]:
+					if abs(bullet.rect.y - enemy.rect.y) < 30 and abs(bullet.rect.x - enemy.rect.x) < 30:
+						enemy_list.remove(enemy)
+						bullet_list.remove(bullet)
 			else:
 				enemy_list.remove(enemy)
 			# add collision logic
+
+	def	check_keydown_events()
 
 	def	check_keybord_event(self):
 		for event in pygame.event.get():
@@ -52,9 +73,10 @@ class ALienInvasion:
 				sys.exit()
 			
 			elif event.type == pygame.KEYDOWN:
+
 				if event.key == pygame.K_ESCAPE:
 					sys.exit()
-
+					
 				elif event.key == pygame.K_UP:
 					self.ship.rect.y -= 20
 				elif event.key == pygame.K_DOWN:
@@ -73,7 +95,7 @@ class ALienInvasion:
 		self.ship.put_ship_on_screen()
 
 	def run_game(self):
-		amount_enemies = 5
+		amount_enemies = 10
 		self.initialise_enemies(amount_enemies)
 		self.update_screen()
 		pygame.display.flip()
@@ -82,7 +104,7 @@ class ALienInvasion:
 			if (len(self.bullet_list) > 0):
 				self.handle_bullet(self.bullet_list)
 			if (len(self.enemy_list) > 0):
-				self.handle_enemies(self.enemy_list)
+				self.handle_enemies(self.enemy_list, self.bullet_list)
 			pygame.display.flip()
 			self.update_screen()
 
