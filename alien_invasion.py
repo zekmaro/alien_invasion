@@ -144,5 +144,9 @@ if __name__ == '__main__':
 # FINITE AMOUNT OF BULLETS
 # ENEMY SHIPS
 # HEALTH BAR
+# KILL COUNT
+# SHILDS
+# MENU
+# PAUSE
 
 # if movement key pressed flag to change position is true till the keyup event took place
