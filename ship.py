@@ -13,6 +13,11 @@ class Ship:
 		self.rect = self.image.get_rect()
 
 		self.rect.midbottom = self.screen_rect.midbottom
+
+		self.move_up = False
+		self.move_down = False
+		self.move_left = False
+		self.move_right = False
 	
 	def put_ship_on_screen(self):
 

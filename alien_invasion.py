@@ -54,7 +54,7 @@ class ALienInvasion:
 
 	def	handle_enemies(self, enemy_list, bullet_list):
 		for enemy in enemy_list[:]:
-			if enemy.rect.y < self.screen_rect.bottom:
+			if enemy.rect.bottom < self.screen_rect.bottom:
 				enemy.put_enemy_on_screen()
 				enemy.rect.y += 1
 				for bullet in bullet_list[:]:
@@ -63,9 +63,26 @@ class ALienInvasion:
 						bullet_list.remove(bullet)
 			else:
 				enemy_list.remove(enemy)
-			# add collision logic
 
-	def	check_keydown_events()
+	def	check_keydown_movement_events(self, event, ship):
+		if event.key == pygame.K_UP:
+			ship.move_up = True
+		elif event.key == pygame.K_DOWN:
+			ship.move_down = True
+		elif event.key == pygame.K_LEFT:
+			ship.move_left = True
+		elif event.key == pygame.K_RIGHT:
+			ship.move_right = True
+	
+	def	check_keyup_movement_events(self, event, ship):
+		if event.key == pygame.K_UP:
+			ship.move_up = False
+		elif event.key == pygame.K_DOWN:
+			ship.move_down = False
+		elif event.key == pygame.K_LEFT:
+			ship.move_left = False
+		elif event.key == pygame.K_RIGHT:
+			ship.move_right = False
 
 	def	check_keybord_event(self):
 		for event in pygame.event.get():
@@ -77,19 +94,26 @@ class ALienInvasion:
 				if event.key == pygame.K_ESCAPE:
 					sys.exit()
 					
-				elif event.key == pygame.K_UP:
-					self.ship.rect.y -= 20
-				elif event.key == pygame.K_DOWN:
-					self.ship.rect.y += 20
-				elif event.key == pygame.K_LEFT:
-					self.ship.rect.x -= 20
-				elif event.key == pygame.K_RIGHT:
-					self.ship.rect.x += 20
+				self.check_keydown_movement_events(event, self.ship)
 
-				elif event.key == pygame.K_SPACE:
+				if event.key == pygame.K_SPACE:
 					temp_bullet = Bullet(self, self.ship)
 					self.bullet_list.append(temp_bullet)
+			
+			elif event.type == pygame.KEYUP:
+
+				self.check_keyup_movement_events(event, self.ship)
 		
+	def	update_ship_position(self, ship):
+		if ship.move_up == True:
+			ship.rect.y -= 3
+		if ship.move_down == True:
+			ship.rect.y += 3
+		if ship.move_right == True:
+			ship.rect.x += 3
+		if ship.move_left == True:
+			ship.rect.x -= 3
+	
 	def update_screen(self):
 		self.back_ground.put_bg_on_screen()
 		self.ship.put_ship_on_screen()
@@ -101,10 +125,13 @@ class ALienInvasion:
 		pygame.display.flip()
 		while True:
 			self.check_keybord_event()
-			if (len(self.bullet_list) > 0):
+			if len(self.bullet_list) > 0:
 				self.handle_bullet(self.bullet_list)
-			if (len(self.enemy_list) > 0):
+			if len(self.enemy_list) > 0:
 				self.handle_enemies(self.enemy_list, self.bullet_list)
+			if len(self.enemy_list) == 0:
+				self.initialise_enemies(amount_enemies)
+			self.update_ship_position(self.ship)
 			pygame.display.flip()
 			self.update_screen()
 
@@ -113,4 +140,9 @@ if __name__ == '__main__':
 	ai.run_game()
 
 # ADD RANDOMIZED OBSTACLES LIKE ROCKS
-# ADD EXPLOTIONS WHEN ENEMY DESTROYED
+# ADD EXPLOTIONS WHEN ENEMY IS DESTROYED
+# FINITE AMOUNT OF BULLETS
+# ENEMY SHIPS
+# HEALTH BAR
+
+# if movement key pressed flag to change position is true till the keyup event took place
