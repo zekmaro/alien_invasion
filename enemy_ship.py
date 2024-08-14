@@ -1,22 +1,27 @@
 import pygame
 import random
 
-class Enemy:
+class EnemyShip:
 
 	def __init__(self, ai_game):
 
 		self.screen = ai_game.screen
 		self.screen_rect = ai_game.screen.get_rect()
 	
-		self.image = pygame.image.load('images/enemy1.png')
-		size = (50, 50)
+		self.image = pygame.image.load('images/enemy_ship.png')
+		size = (70, 70)
 		self.image = pygame.transform.scale(self.image, size)
 		self.rect = self.image.get_rect()
 
 		self.rect.x = random.randint(0, self.screen_rect.width - self.rect.width)
-		self.rect.y = 0
+		self.rect.y = 20
 
-		self.can_move = True
+		self.move_up = False
+		self.move_down = True
+		self.move_left = False
+		self.move_right = False
+
+		self.can_move = False
 	
 	def put_enemy_on_screen(self):
 
