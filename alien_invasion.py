@@ -24,7 +24,6 @@ class ALienInvasion:
 		self.bullet_list = []
 		self.enemy_list = []
 		self.enemy_ship_list = []
-		self.enemy_ship_bullet_list = []
 
 	def	check_enemy_exist_at_x(self, existing_enemy, current_enemy_coor_x):
 		return abs(existing_enemy.rect.x - current_enemy_coor_x) >= 50
@@ -46,15 +45,22 @@ class ALienInvasion:
 			enemy_list.append(enemy)
 			amount_enemies -= 1
 
-	def	handle_bullet(self, bullet_list):
+	def handle_enemy_shooting(self, enemy_list, direction):
+		"""Handle shooting for each enemy and update their bullets."""
+		for enemy in enemy_list:
+			enemy.shoot()
+			self.handle_bullet(enemy.bullet_list, direction)
+
+	def	handle_bullet(self, bullet_list, direction):
+		"""Update and render bullets; remove bullets that are off-screen."""
 		for bullet in bullet_list[:]:
-			if bullet.rect.y > 0:
-				bullet.put_bullet_on_screen()
-				bullet.rect.y -= 10
-			else:
+			if not bullet.update_bullet_position(direction):
 				bullet_list.remove(bullet)
+			else:
+				bullet.put_bullet_on_screen()
 
 	def	handle_enemies(self, enemy_list, bullet_list):
+		"""Handle enemies, check for collisions with player bullets."""
 		for enemy in enemy_list[:]:
 			if enemy.rect.bottom < self.screen_rect.bottom:
 				enemy.put_enemy_on_screen()
@@ -100,7 +106,7 @@ class ALienInvasion:
 				self.check_keydown_movement_events(event, self.ship)
 
 				if event.key == pygame.K_SPACE:
-					temp_bullet = Bullet(self, self.ship)
+					temp_bullet = Bullet(self, self.ship, 'images/bullet.png', direction='up')
 					self.bullet_list.append(temp_bullet)
 			
 			elif event.type == pygame.KEYUP:
@@ -122,24 +128,37 @@ class ALienInvasion:
 		self.ship.put_ship_on_screen()
 
 	def run_game(self):
-		amount_enemies = 2
+
+		amount_enemies = 4
 		self.initialise_enemies(Enemy, self.enemy_list, amount_enemies)
 		self.initialise_enemies(EnemyShip, self.enemy_ship_list, amount_enemies)
 		self.update_screen()
 		pygame.display.flip()
+
 		while True:
+
 			self.check_keybord_event()
+			self.update_ship_position(self.ship)
+
+			# Handle player's bullets
 			if len(self.bullet_list) > 0:
-				self.handle_bullet(self.bullet_list)
+				self.handle_bullet(self.bullet_list, direction='up')
+
+			# Handle mosters, enemy ships and their bullets
 			if len(self.enemy_list) > 0:
 				self.handle_enemies(self.enemy_list, self.bullet_list)
 			if len(self.enemy_ship_list) > 0:
 				self.handle_enemies(self.enemy_ship_list, self.bullet_list)
+			
+			self.handle_enemy_shooting(self.enemy_ship_list, direction='down')
+			
+			# Reinitialize enemies if all are destroyed
 			if len(self.enemy_list) == 0:
 				self.initialise_enemies(Enemy, self.enemy_list, amount_enemies)
 			if len(self.enemy_ship_list) == 0:
 				self.initialise_enemies(EnemyShip, self.enemy_ship_list, amount_enemies)
-			self.update_ship_position(self.ship)
+
+			# Update the display
 			pygame.display.flip()
 			self.update_screen()
 
@@ -159,5 +178,6 @@ if __name__ == '__main__':
 # ENEMIES SHOOTING AND MOVING
 # REFACTOR CODE
 # MAKE GAMEPLAY MORE INTERESTING
+# ADD POWERUPS
 
 # if movement key pressed flag to change position is true till the keyup event took place
