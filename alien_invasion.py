@@ -199,7 +199,7 @@ class ALienInvasion:
 
 	def run_game(self):
 
-		amount_enemies = 4
+		amount_enemies = 5
 		self.initialise_enemies(Enemy, self.enemy_list, amount_enemies)
 		self.initialise_enemies(EnemyShip, self.enemy_ship_list, amount_enemies)
 		self.initialise_health(self.health_list)
@@ -258,3 +258,6 @@ if __name__ == '__main__':
 # BLACK HOLE AS LEVEL ENDING
 # ADD COINS (CAN BUY NEW SHIPS ANS SHOTS)
 # ADD MUSIC
+# ADD RANDOM AMOUNT OF ENEMIES AT RANDOM TIMINGS
+# ADD PLANET HEALTH BAR
+# ADD COLISION WITH LITTLE ENEMIES
