@@ -27,6 +27,7 @@ class ALienInvasion:
 		self.bullet_list = []
 		self.enemy_list = []
 		self.enemy_ship_list = []
+		self.last_move_time = pygame.time.get_ticks()
 
 		self.health_list = []
 
@@ -77,7 +78,44 @@ class ALienInvasion:
 						bullet_list.remove(bullet)
 			else:
 				enemy_list.remove(enemy)
+	
+	def define_dir_enemy_ships(self, enemy_ship_list, delay=1000):
+		current_time = pygame.time.get_ticks()
+		if current_time - self.last_move_time > delay:
+			for enemy in enemy_ship_list:
+				flag = random.randint(1000, 2000)
+				if flag < 1500:
+					enemy.move_left = True
+					enemy.move_right = False
+				else:
+					enemy.move_right = True
+					enemy.move_left = False
+			self.last_move_time = current_time
+	
+	def switch_enemy_ship_direction(self, enemy):
+		if enemy.move_left == True:
+			enemy.move_left = False
+			enemy.move_right = True
+		elif enemy.move_right == True:
+			enemy.move_right = False
+			enemy.move_false = True
 
+	def check_collision_enemy_ships(self, enemy_ship_list):
+		for enemy in enemy_ship_list:
+			if enemy.move_left == True and enemy.rect.left > 0:
+				enemy.rect.x -= 1
+			elif enemy.move_right == True and enemy.rect.right < self.screen_rect.right:
+				enemy.rect.x += 1
+			for other in enemy_ship_list:
+				if other != enemy and abs(enemy.rect.x - other.rect.x) < 100:
+					self.switch_enemy_ship_direction(enemy)
+					self.switch_enemy_ship_direction(other)
+					break 
+	
+	def move_enemy_ships(self, enemy_ship_list):
+		self.define_dir_enemy_ships(enemy_ship_list)
+		self.check_collision_enemy_ships(enemy_ship_list)
+			
 	def	check_keydown_movement_events(self, event, ship):
 		if event.key == pygame.K_UP:
 			ship.move_up = True
@@ -172,6 +210,7 @@ class ALienInvasion:
 
 			self.check_keybord_event()
 			self.update_ship_position(self.ship)
+			self.move_enemy_ships(self.enemy_ship_list)
 
 			# Handle player's bullets
 			if len(self.bullet_list) > 0:
@@ -208,17 +247,14 @@ if __name__ == '__main__':
 # ADD RANDOMIZED OBSTACLES LIKE ROCKS
 # ADD EXPLOTIONS WHEN ENEMY IS DESTROYED
 # FINITE AMOUNT OF BULLETS
-# ENEMY SHIPS
-# HEALTH BAR
 # KILL COUNT
 # SHILDS
 # MENU
 # PAUSE
-# ENEMIES SHOOTING AND MOVING
 # REFACTOR CODE
 # MAKE GAMEPLAY MORE INTERESTING
 # ADD POWERUPS
 # RIGHT/LEFT MOVEMENT OF ENEMYSHIPS
 # BLACK HOLE AS LEVEL ENDING
+# ADD COINS (CAN BUY NEW SHIPS ANS SHOTS)
 # ADD MUSIC
-# if movement key pressed flag to change position is true till the keyup event took place
