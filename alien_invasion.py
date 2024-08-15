@@ -6,6 +6,7 @@ from	background import BackGround
 from	bullet import Bullet
 from	enemy import Enemy
 from	enemy_ship import EnemyShip
+from	heart import Heart
 
 class ALienInvasion:
 
@@ -19,11 +20,15 @@ class ALienInvasion:
 		self.bg_color = (230, 230, 230)
 
 		self.ship = Ship(self)
-		self.back_ground = BackGround(self)
+		self.back_ground = BackGround(self, 1200, 900, 'images/maps/void.png')
+		self.game_over = BackGround(self, 600, 600, 'images/game_over.png')
+		self.game_over.rect.x += 320
 		
 		self.bullet_list = []
 		self.enemy_list = []
 		self.enemy_ship_list = []
+
+		self.health_list = []
 
 	def	check_enemy_exist_at_x(self, existing_enemy, current_enemy_coor_x):
 		return abs(existing_enemy.rect.x - current_enemy_coor_x) >= 50
@@ -112,7 +117,27 @@ class ALienInvasion:
 			elif event.type == pygame.KEYUP:
 
 				self.check_keyup_movement_events(event, self.ship)
-		
+	
+	def	check_player_damaged(self, ship, enemy_list, heart_list):
+		for enemy in enemy_list:
+			for bullet in enemy.bullet_list:
+				if abs(bullet.rect.y - ship.rect.y) < 30 and abs(bullet.rect.x - ship.rect.x) < 35:
+					if heart_list:
+						heart_list.pop()
+						enemy.bullet_list.remove(bullet)
+						return
+	
+	def initialise_health(self, health_list):
+		offset = 0
+		for i in range (0, 3):
+			heart = Heart(self, offset)
+			health_list.append(heart)
+			offset += 50
+
+	def put_health_list_on_screen(self, health_list):
+		for heart in health_list:
+			heart.put_heart_on_screen()
+	
 	def	update_ship_position(self, ship):
 		if ship.move_up == True:
 			ship.rect.y -= 3
@@ -126,12 +151,20 @@ class ALienInvasion:
 	def update_screen(self):
 		self.back_ground.put_bg_on_screen()
 		self.ship.put_ship_on_screen()
+	
+	def end_game(self):
+		while True:
+			pygame.display.flip()
+			self.back_ground.put_bg_on_screen()
+			self.game_over.put_bg_on_screen()
+			self.check_keybord_event()
 
 	def run_game(self):
 
 		amount_enemies = 4
 		self.initialise_enemies(Enemy, self.enemy_list, amount_enemies)
 		self.initialise_enemies(EnemyShip, self.enemy_ship_list, amount_enemies)
+		self.initialise_health(self.health_list)
 		self.update_screen()
 		pygame.display.flip()
 
@@ -158,6 +191,12 @@ class ALienInvasion:
 			if len(self.enemy_ship_list) == 0:
 				self.initialise_enemies(EnemyShip, self.enemy_ship_list, amount_enemies)
 
+			self.check_player_damaged(self.ship, self.enemy_ship_list, self.health_list)
+			if not self.health_list:
+				self.end_game()
+
+			self.put_health_list_on_screen(self.health_list)
+
 			# Update the display
 			pygame.display.flip()
 			self.update_screen()
@@ -179,5 +218,7 @@ if __name__ == '__main__':
 # REFACTOR CODE
 # MAKE GAMEPLAY MORE INTERESTING
 # ADD POWERUPS
-
+# RIGHT/LEFT MOVEMENT OF ENEMYSHIPS
+# BLACK HOLE AS LEVEL ENDING
+# ADD MUSIC
 # if movement key pressed flag to change position is true till the keyup event took place
