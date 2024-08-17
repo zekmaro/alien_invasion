@@ -7,6 +7,7 @@ from	bullet import Bullet
 from	enemy import Enemy
 from	enemy_ship import EnemyShip
 from	heart import Heart
+from	score import Score
 
 class ALienInvasion:
 
@@ -17,9 +18,9 @@ class ALienInvasion:
 		self.screen_rect = self.screen.get_rect()
 
 		pygame.display.set_caption("Alien Invasion")
-		self.bg_color = (230, 230, 230)
 
 		self.ship = Ship(self)
+		self.score = Score(self)
 		self.back_ground = BackGround(self, 1200, 900, 'images/maps/void.png')
 		self.game_over = BackGround(self, 600, 600, 'images/game_over.png')
 		self.game_over.rect.x += 320
@@ -27,9 +28,10 @@ class ALienInvasion:
 		self.bullet_list = []
 		self.enemy_list = []
 		self.enemy_ship_list = []
+		self.health_list = []
+
 		self.last_move_time = pygame.time.get_ticks()
 
-		self.health_list = []
 
 	def	check_enemy_exist_at_x(self, existing_enemy, current_enemy_coor_x):
 		return abs(existing_enemy.rect.x - current_enemy_coor_x) >= 50
@@ -65,7 +67,7 @@ class ALienInvasion:
 			else:
 				bullet.put_bullet_on_screen()
 
-	def	handle_enemies(self, enemy_list, bullet_list):
+	def	handle_enemies(self, enemy_list, bullet_list, score):
 		"""Handle enemies, check for collisions with player bullets."""
 		for enemy in enemy_list[:]:
 			if enemy.rect.bottom < self.screen_rect.bottom:
@@ -76,6 +78,7 @@ class ALienInvasion:
 					if abs(bullet.rect.y - enemy.rect.y) < 30 and abs(bullet.rect.x - enemy.rect.x) < 30:
 						enemy_list.remove(enemy)
 						bullet_list.remove(bullet)
+						score.increase_score()
 			else:
 				enemy_list.remove(enemy)
 	
@@ -218,9 +221,9 @@ class ALienInvasion:
 
 			# Handle mosters, enemy ships and their bullets
 			if len(self.enemy_list) > 0:
-				self.handle_enemies(self.enemy_list, self.bullet_list)
+				self.handle_enemies(self.enemy_list, self.bullet_list, self.score)
 			if len(self.enemy_ship_list) > 0:
-				self.handle_enemies(self.enemy_ship_list, self.bullet_list)
+				self.handle_enemies(self.enemy_ship_list, self.bullet_list, self.score)
 			
 			self.handle_enemy_shooting(self.enemy_ship_list, direction='down')
 			
@@ -235,6 +238,7 @@ class ALienInvasion:
 				self.end_game()
 
 			self.put_health_list_on_screen(self.health_list)
+			self.score.put_score_on_screen(self.score.score_value, self.screen_rect.right - 100)
 
 			# Update the display
 			pygame.display.flip()
