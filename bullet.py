@@ -28,9 +28,9 @@ class Bullet:
 	def update_bullet_position(self, direction):
 		"""Move the bullet and check if it's still on the screen."""
 		if self.direction == "up":
-			self.rect.y -= 10
+			self.rect.y -= 20
 		elif self.direction == "down":
-			self.rect.y += 10
+			self.rect.y += 20
 
 		if self.rect.y < 0 or self.rect.y > self.screen_rect.height:
 			return False

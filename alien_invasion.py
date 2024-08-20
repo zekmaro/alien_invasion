@@ -14,16 +14,19 @@ class ALienInvasion:
 	def __init__(self):
 		pygame.init()
 
-		self.screen = pygame.display.set_mode((1200, 800))
+		self.screen = pygame.display.set_mode((1820, 920))
 		self.screen_rect = self.screen.get_rect()
 
 		pygame.display.set_caption("Alien Invasion")
 
 		self.ship = Ship(self)
 		self.score = Score(self)
-		self.back_ground = BackGround(self, 1200, 900, 'images/maps/void.png')
+		self.back_ground = BackGround(self, 1820, 920, 'images/maps/cold.png')
 		self.game_over = BackGround(self, 600, 600, 'images/game_over.png')
 		self.game_over.rect.x += 320
+
+		self.clock = pygame.time.Clock()
+		self.FPS = 60
 		
 		self.bullet_list = []
 		self.enemy_list = []
@@ -67,13 +70,14 @@ class ALienInvasion:
 			else:
 				bullet.put_bullet_on_screen()
 
-	def	handle_enemies(self, enemy_list, bullet_list, score):
+	def	handle_enemies(self, enemy_list, bullet_list, score, dt):
 		"""Handle enemies, check for collisions with player bullets."""
+		move_speed = 150
 		for enemy in enemy_list[:]:
 			if enemy.rect.bottom < self.screen_rect.bottom:
 				enemy.put_enemy_on_screen()
 				if enemy.can_move == True:
-					enemy.rect.y += 1
+					enemy.rect.y += move_speed * dt
 				for bullet in bullet_list[:]:
 					if abs(bullet.rect.y - enemy.rect.y) < 30 and abs(bullet.rect.x - enemy.rect.x) < 30:
 						enemy_list.remove(enemy)
@@ -103,21 +107,22 @@ class ALienInvasion:
 			enemy.move_right = False
 			enemy.move_false = True
 
-	def check_collision_enemy_ships(self, enemy_ship_list):
+	def check_collision_enemy_ships(self, enemy_ship_list, dt):
+		move_speed = 300
 		for enemy in enemy_ship_list:
 			if enemy.move_left == True and enemy.rect.left > 0:
-				enemy.rect.x -= 1
+				enemy.rect.x -= move_speed * dt
 			elif enemy.move_right == True and enemy.rect.right < self.screen_rect.right:
-				enemy.rect.x += 1
+				enemy.rect.x += move_speed * dt
 			for other in enemy_ship_list:
 				if other != enemy and abs(enemy.rect.x - other.rect.x) < 100:
 					self.switch_enemy_ship_direction(enemy)
 					self.switch_enemy_ship_direction(other)
 					break 
 	
-	def move_enemy_ships(self, enemy_ship_list):
+	def move_enemy_ships(self, enemy_ship_list, dt):
 		self.define_dir_enemy_ships(enemy_ship_list)
-		self.check_collision_enemy_ships(enemy_ship_list)
+		self.check_collision_enemy_ships(enemy_ship_list, dt)
 			
 	def	check_keydown_movement_events(self, event, ship):
 		if event.key == pygame.K_UP:
@@ -179,15 +184,16 @@ class ALienInvasion:
 		for heart in health_list:
 			heart.put_heart_on_screen()
 	
-	def	update_ship_position(self, ship):
+	def	update_ship_position(self, ship, dt):
+		move_speed = 650
 		if ship.move_up == True:
-			ship.rect.y -= 3
+			ship.rect.y -= move_speed * dt
 		if ship.move_down == True:
-			ship.rect.y += 3
+			ship.rect.y += move_speed * dt
 		if ship.move_right == True:
-			ship.rect.x += 3
+			ship.rect.x += move_speed * dt
 		if ship.move_left == True:
-			ship.rect.x -= 3
+			ship.rect.x -= move_speed * dt
 	
 	def update_screen(self):
 		self.back_ground.put_bg_on_screen()
@@ -211,9 +217,11 @@ class ALienInvasion:
 
 		while True:
 
+			dt = self.clock.tick(self.FPS) / 1000
+
 			self.check_keybord_event()
-			self.update_ship_position(self.ship)
-			self.move_enemy_ships(self.enemy_ship_list)
+			self.update_ship_position(self.ship, dt)
+			self.move_enemy_ships(self.enemy_ship_list, dt)
 
 			# Handle player's bullets
 			if len(self.bullet_list) > 0:
@@ -221,9 +229,9 @@ class ALienInvasion:
 
 			# Handle mosters, enemy ships and their bullets
 			if len(self.enemy_list) > 0:
-				self.handle_enemies(self.enemy_list, self.bullet_list, self.score)
+				self.handle_enemies(self.enemy_list, self.bullet_list, self.score, dt)
 			if len(self.enemy_ship_list) > 0:
-				self.handle_enemies(self.enemy_ship_list, self.bullet_list, self.score)
+				self.handle_enemies(self.enemy_ship_list, self.bullet_list, self.score, dt)
 			
 			self.handle_enemy_shooting(self.enemy_ship_list, direction='down')
 			
@@ -263,3 +271,4 @@ if __name__ == '__main__':
 # ADD RANDOM AMOUNT OF ENEMIES AT RANDOM TIMINGS
 # ADD PLANET HEALTH BAR
 # ADD COLISION WITH LITTLE ENEMIES
+# OBJECTIVES OF LEVEL
