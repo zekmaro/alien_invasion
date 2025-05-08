@@ -14,14 +14,14 @@ class ALienInvasion:
 	def __init__(self):
 		pygame.init()
 
-		self.screen = pygame.display.set_mode((1820, 920))
+		self.screen = pygame.display.set_mode((1430, 820))
 		self.screen_rect = self.screen.get_rect()
 
 		pygame.display.set_caption("Alien Invasion")
 
 		self.ship = Ship(self)
 		self.score = Score(self)
-		self.back_ground = BackGround(self, 1820, 920, 'images/maps/cold.png')
+		self.back_ground = BackGround(self, 1430, 820, 'images/maps/void.png')
 		self.game_over = BackGround(self, 600, 600, 'images/game_over.png')
 		self.game_over.rect.x += 320
 
@@ -272,3 +272,7 @@ if __name__ == '__main__':
 # ADD PLANET HEALTH BAR
 # ADD COLISION WITH LITTLE ENEMIES
 # OBJECTIVES OF LEVEL
+
+# BERSERKERS MAIN VILLIANS DESTROYERS OF THE PLANETS
+# DIFFERENT SPICIES
+# YOU CAN ALSO PLAY FOR DESTROYERS
